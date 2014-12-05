@@ -100,17 +100,32 @@ module Searchkick
 
               if field == "_all" or field.end_with?(".analyzed")
                 shared_options[:cutoff_frequency] = 0.001 unless operator == "and"
-                qs.concat [
-                  shared_options.merge(boost: 10 * factor, analyzer: "searchkick_search"),
-                  shared_options.merge(boost: 10 * factor, analyzer: "searchkick_search2")
-                ]
+
+                if options[:analyzers] && options[:analyzers].kind_of?(Array)
+                  options[:analyzers].each do |analyzer|
+                    qs << shared_options.merge(boost: 10 * factor, analyzer: analyzer)
+                  end
+                else
+                  qs.concat [
+                    shared_options.merge(boost: 10 * factor, analyzer: "searchkick_search"),
+                    shared_options.merge(boost: 10 * factor, analyzer: "searchkick_search2")
+                  ]
+                end
+
                 misspellings = options.has_key?(:misspellings) ? options[:misspellings] : options[:mispellings] # why not?
                 if misspellings != false
                   edit_distance = (misspellings.is_a?(Hash) && (misspellings[:edit_distance] || misspellings[:distance])) || 1
-                  qs.concat [
-                    shared_options.merge(fuzziness: edit_distance, max_expansions: 3, analyzer: "searchkick_search"),
-                    shared_options.merge(fuzziness: edit_distance, max_expansions: 3, analyzer: "searchkick_search2")
-                  ]
+
+                  if options[:analyzers] && options[:analyzers].kind_of?(Array)
+                    options[:analyzers].each do |analyzer|
+                      qs << shared_options.merge(boost: 10 * factor, analyzer: analyzer)
+                    end
+                  else
+                    qs.concat [
+                      shared_options.merge(fuzziness: edit_distance, max_expansions: 3, analyzer: "searchkick_search"),
+                      shared_options.merge(fuzziness: edit_distance, max_expansions: 3, analyzer: "searchkick_search2")
+                    ]
+                  end
                 end
               elsif field.end_with?(".exact")
                 f = field.split(".")[0..-2].join(".")
