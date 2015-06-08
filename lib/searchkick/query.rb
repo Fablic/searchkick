@@ -98,7 +98,7 @@ module Searchkick
                 boost: factor
               }
 
-              if field == "_all" or field.end_with?(".analyzed")
+              if field == "_all" || field.end_with?(".analyzed")
                 shared_options[:cutoff_frequency] = 0.001 unless operator == "and"
 
                 if options[:analyzers] && options[:analyzers].kind_of?(Array)
@@ -112,7 +112,7 @@ module Searchkick
                   ]
                 end
 
-                misspellings = options.has_key?(:misspellings) ? options[:misspellings] : options[:mispellings] # why not?
+                misspellings = options.key?(:misspellings) ? options[:misspellings] : options[:mispellings] # why not?
                 if misspellings != false
                   edit_distance = (misspellings.is_a?(Hash) && (misspellings[:edit_distance] || misspellings[:distance])) || 1
 
