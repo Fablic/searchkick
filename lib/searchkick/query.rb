@@ -100,6 +100,7 @@ module Searchkick
 
               if field == "_all" or field.end_with?(".analyzed")
                 shared_options[:cutoff_frequency] = 0.001 unless operator == "and"
+
                 if options[:analyzers] && options[:analyzers].kind_of?(Array)
                   options[:analyzers].each do |analyzer|
                     qs << shared_options.merge(boost: 10 * factor, analyzer: analyzer)
